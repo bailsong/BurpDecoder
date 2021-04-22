@@ -43,8 +43,7 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 	@Override
 	public void processProxyMessage(boolean messageIsRequest,IInterceptedProxyMessage messageInfo) {
 		IRequestInfo requestInfo = this.hps.analyzeRequest(messageInfo.getMessageInfo());
-		String URL = requestInfo.getUrl().toString();
-		String domain = Common.Common.get_Domain_URL(URL);
+		String domain = Common.Common.get_Doamin_URL_From_message(messageInfo.getMessageInfo());
 		if(this.Site_List.containsKey(domain) && this.BurpStatus) {
 			if(messageIsRequest) {
 				String request_String = new String(messageInfo.getMessageInfo().getRequest());
@@ -63,8 +62,7 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 	
 	public void processHttpMessage(int toolFlag,boolean messageIsRequest, IHttpRequestResponse messageInfo) {
 		IRequestInfo requestInfo = this.hps.analyzeRequest(messageInfo);
-		String URL = requestInfo.getUrl().toString();
-		String domain = Common.Common.get_Domain_URL(URL);
+		String domain = Common.Common.get_Doamin_URL_From_message(messageInfo);
 		if(this.Site_List.containsKey(domain)){
 			if(toolFlag == IBurpExtenderCallbacks.TOOL_PROXY && this.BurpStatus){
 				if(messageIsRequest){

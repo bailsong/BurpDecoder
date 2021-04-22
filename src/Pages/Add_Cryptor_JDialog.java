@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.border.LineBorder;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,10 @@ public class Add_Cryptor_JDialog extends JDialog {
 	public JTextField Data_Position_TXT;
 	public JButton Data_Position_BTN;
 	public String Data_Format = "RAW";
+	String[] Cryptor_List = new String[] {"Cryptor_URL","Cryptor_HEX","Cryptor_AES"};
+	public String[] Data_Format_List = new String[] {"RAW","JSON"};
+	public JComboBox Cryptor_List_Box;
+	public JComboBox DataFormat_Select_CBX;
 	/**
 	 * Launch the application.
 	 */
@@ -36,11 +41,15 @@ public class Add_Cryptor_JDialog extends JDialog {
 		setMinimumSize(new Dimension(800, 800));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
+
+		init_Component();
 		
 		this.self_Crypto = new Crypto_URL();
-		this.Middle_Panel = this.self_Crypto.self_Panel;
-		
-		init_Component();
+		this.Middle_Panel.removeAll();
+		this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
+		this.Middle_Panel.setVisible(true);
+		this.invalidate();
+		this.repaint();
 		this.setVisible(true);
 	}
 	public Add_Cryptor_JDialog(Crypto para_Crypto) {
@@ -48,11 +57,30 @@ public class Add_Cryptor_JDialog extends JDialog {
 		setMinimumSize(new Dimension(800, 800));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
-		
-		this.self_Crypto = para_Crypto;
-		this.Middle_Panel = this.self_Crypto.self_Panel;
-		
+
 		init_Component();
+		
+		int index = Common.Common.get_First_Index_String(this.Cryptor_List, para_Crypto.self_Type);
+		if(index == -1) {
+			this.dispose();
+		}
+		
+		index = Common.Common.get_First_Index_String(this.Data_Format_List, para_Crypto.Data_Format);
+		this.Data_Format = para_Crypto.Data_Format;
+		this.DataFormat_Select_CBX.setSelectedIndex(index);
+		this.Data_Position_TXT.setText(para_Crypto.Data_Position);
+		if(!para_Crypto.Data_Format.equals("RAW")) {
+			this.Data_Position_TXT.setEditable(true);
+			this.Data_Position_BTN.setEnabled(true);
+		}
+		
+		this.Cryptor_List_Box.setSelectedIndex(index);
+		this.self_Crypto = para_Crypto;
+		this.Middle_Panel.removeAll();
+		this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
+		this.Middle_Panel.setVisible(true);
+		this.invalidate();
+		this.repaint();
 		this.setVisible(true);
 	}
 	public void init_Component() {
@@ -91,14 +119,14 @@ public class Add_Cryptor_JDialog extends JDialog {
 		
 		
 
-		String[] Cryptor_List = new String[] {"Crypto_URL","Crypto_AES"};
+		
 		
 		Component verticalStrut_4 = Box.createVerticalStrut(20);
 		verticalBox.add(verticalStrut_4);
-		JComboBox Crypto_List = new JComboBox(Cryptor_List);
-		Crypto_List.setMaximumSize(new Dimension(150, 30));
-		Crypto_List.setPreferredSize(new Dimension(150, 50));
-		verticalBox.add(Crypto_List);
+		Cryptor_List_Box = new JComboBox(Cryptor_List);
+		Cryptor_List_Box.setMaximumSize(new Dimension(150, 30));
+		Cryptor_List_Box.setPreferredSize(new Dimension(150, 50));
+		verticalBox.add(Cryptor_List_Box);
 		
 		Box verticalBox_1 = Box.createVerticalBox();
 		verticalBox_1.setMaximumSize(new Dimension(400, 180));
@@ -131,7 +159,7 @@ public class Add_Cryptor_JDialog extends JDialog {
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		horizontalBox_1.add(horizontalStrut_1);
 		String[] Data_Format_List = new String[] {"RAW","JSON"};
-		JComboBox DataFormat_Select_CBX = new JComboBox(Data_Format_List);
+		DataFormat_Select_CBX = new JComboBox(Data_Format_List);
 		DataFormat_Select_CBX.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
@@ -184,16 +212,19 @@ public class Add_Cryptor_JDialog extends JDialog {
 		horizontalBox_2.add(Data_Position_BTN);
 		
 		//设置监听事件门
-		Crypto_List.addItemListener(new ItemListener() {
+		Cryptor_List_Box.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED ) {
-					Change_Cryptor_Panel(Crypto_List.getSelectedItem().toString());
+					Change_Cryptor_Panel(Cryptor_List_Box.getSelectedItem().toString());
 					
 				}
 			}
 		});
 		
 		Middle_Panel = new JPanel();
+		Middle_Panel.setMinimumSize(new Dimension(400, 400));
+		Middle_Panel.setMaximumSize(new Dimension(400, 400));
+		Middle_Panel.setPreferredSize(new Dimension(400, 400));
 		Middle_Panel.setLayout(new BorderLayout());
 		Container_Panel.add(Middle_Panel,BorderLayout.CENTER);
 		Middle_Panel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -222,7 +253,7 @@ public class Add_Cryptor_JDialog extends JDialog {
 	
 	public void Change_Cryptor_Panel(String para_Cryptor) {
 		switch(para_Cryptor) {
-		case "Crypto_URL":
+		case "Cryptor_URL":
 			this.self_Crypto = new Crypto_URL();
 			this.Middle_Panel.removeAll();
 			this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
@@ -230,9 +261,8 @@ public class Add_Cryptor_JDialog extends JDialog {
 			this.invalidate();
 			this.repaint();
 			this.setVisible(true);
-			System.out.println("Crypto_URL"+"Is selected");
 			break;
-		case "Crypto_AES":
+		case "Cryptor_AES":
 			this.self_Crypto = new Crypto_AES();
 			this.Middle_Panel.removeAll();
 			this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
@@ -240,8 +270,15 @@ public class Add_Cryptor_JDialog extends JDialog {
 			this.invalidate();
 			this.repaint();
 			this.setVisible(true);
-			System.out.println("Crypto_AES"+"Is selected");
 			break;
+		case "Cryptor_HEX":
+			this.self_Crypto = new Crypto_HEX();
+			this.Middle_Panel.removeAll();
+			this.Middle_Panel.add(this.self_Crypto.self_Panel);
+			this.Middle_Panel.setVisible(true);
+			this.invalidate();
+			this.repaint();
+			this.setVisible(true);
 		default:
 			break;
 		}

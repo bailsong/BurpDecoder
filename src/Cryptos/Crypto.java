@@ -6,11 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 
 public abstract class Crypto {
 	public final String Data_Format_RAW = "RAW";
-	public final String Data_Format_JSON = "";
+	public final String Data_Format_JSON = "JSON";
 	
 	
 	public String Data_Position = "";
-	public String Data_Format = "Data_Format_RAW";
+	public String Data_Format = Data_Format_RAW;
 	public String self_Type="";
 	public JPanel self_Panel ;
 	
@@ -47,7 +47,7 @@ public abstract class Crypto {
 			break;
 		case "RAW": result = set_Data_Posi_String_DATA_RAW(para_Data,this.Data_Position, encoded_Str);
 			break;
-		default: result = "";
+		default: result = para_Data;
 		}
 		return result;
 	}
@@ -64,65 +64,76 @@ public abstract class Crypto {
 	
 	// Data_Format_JSON
 	public  String get_Data_Posi_String_DATA_JSON(String para_Data,String Data_Position) {
-		JSONObject json_Data = JSON.parseObject(para_Data);
-		String[] tmp_DataPosi = Data_Position.split("\\.");
-		Object tmp_Object = json_Data ;
-		for(String itera:tmp_DataPosi) {
-			if(itera.equalsIgnoreCase("*"))
-				break;
-			if(tmp_Object instanceof JSONObject && itera.startsWith("\"")) {
-				tmp_Object = ((JSONObject)tmp_Object).get(itera.replace("\"", ""));
+		try {
+			JSONObject json_Data = JSON.parseObject(para_Data);
+			String[] tmp_DataPosi = Data_Position.split("\\.");
+			Object tmp_Object = json_Data ;
+			for(String itera:tmp_DataPosi) {
+				if(itera.equalsIgnoreCase("*"))
+					break;
+				if(tmp_Object instanceof JSONObject && itera.startsWith("\"")) {
+					tmp_Object = ((JSONObject)tmp_Object).get(itera.replace("\"", ""));
+				}
+				else if(tmp_Object instanceof JSONArray) {
+					tmp_Object = ((JSONArray)tmp_Object).get(Integer.valueOf(itera));
+				}
+				else {
+					return para_Data;
+				}
 			}
-			else if(tmp_Object instanceof JSONArray) {
-				tmp_Object = ((JSONArray)tmp_Object).get(Integer.valueOf(itera));
-			}
-			else {
-				return para_Data;
-			}
+			return tmp_Object.toString();
+		}catch(Exception e) {
+			return "";
 		}
-		return tmp_Object.toString();
+		
+		
 	}
 	
 	
 	public  Object set_Data_Posi_String_DATA_JSON(String para_Data,String Data_Position,String EncodeStr) {
-		if(Data_Position.equals("*")) {
-			return EncodeStr;
-		}else {
-			int first_index = Data_Position.indexOf(".");
-			if(first_index == -1) {
-				return null;
+		try {
+			if(Data_Position.equals("*")) {
+				return EncodeStr;
 			}else {
-				String key = Data_Position.substring(0, first_index);
-				Object result_Object = JSON.parse(para_Data);
-				Object tmp_Object;
-				if(result_Object instanceof JSONObject) {
-					try {
-						tmp_Object = ((JSONObject) result_Object).get(key);
-						tmp_Object = set_Data_Posi_String_DATA_JSON(tmp_Object.toString(),Data_Position.substring(first_index+1),EncodeStr);
-						if(tmp_Object == null) {
+				int first_index = Data_Position.indexOf(".");
+				if(first_index == -1) {
+					return null;
+				}else {
+					String key = Data_Position.substring(0, first_index);
+					Object result_Object = JSON.parse(para_Data);
+					Object tmp_Object;
+					if(result_Object instanceof JSONObject) {
+						try {
+							tmp_Object = ((JSONObject) result_Object).get(key);
+							tmp_Object = set_Data_Posi_String_DATA_JSON(tmp_Object.toString(),Data_Position.substring(first_index+1),EncodeStr);
+							if(tmp_Object == null) {
+								return null;
+							}
+							((JSONObject) result_Object).put(key, tmp_Object);
+						}catch(Exception e) {
 							return null;
 						}
-						((JSONObject) result_Object).put(key, tmp_Object);
-					}catch(Exception e) {
-						return null;
-					}
-				}else if(result_Object instanceof JSONArray) {
-					try {
-						int index = Integer.parseInt(key);
-						tmp_Object = ((JSONArray) result_Object).get(index);
-						tmp_Object = set_Data_Posi_String_DATA_JSON(tmp_Object.toString(),Data_Position.substring(first_index+1),EncodeStr);
-						if(tmp_Object == null) {
+					}else if(result_Object instanceof JSONArray) {
+						try {
+							int index = Integer.parseInt(key);
+							tmp_Object = ((JSONArray) result_Object).get(index);
+							tmp_Object = set_Data_Posi_String_DATA_JSON(tmp_Object.toString(),Data_Position.substring(first_index+1),EncodeStr);
+							if(tmp_Object == null) {
+								return null;
+							}
+							((JSONArray) result_Object).set(index, tmp_Object);
+						}catch(Exception e) {
 							return null;
 						}
-						((JSONArray) result_Object).set(index, tmp_Object);
-					}catch(Exception e) {
-						return null;
+						
 					}
-					
+					return result_Object;
 				}
-				return result_Object;
 			}
+		}catch(Exception e){
+			return para_Data;
 		}
+		
 	}
 	
 	

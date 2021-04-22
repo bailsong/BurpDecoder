@@ -123,6 +123,11 @@ public class Dashboard extends JPanel {
 		panel.add(Reqeust_Cryptor_Edit_Btn);
 		
 		JButton Reqeust_Cryptor_Remove_Btn = new JButton("Remove");
+		Reqeust_Cryptor_Remove_Btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Request_Cryptor_Remove();
+			}
+		});
 		Reqeust_Cryptor_Remove_Btn.setBounds(59, 264, 113, 27);
 		panel.add(Reqeust_Cryptor_Remove_Btn);
 		Reqeust_Cryptor_Edit_Btn.addActionListener(new ActionListener() {
@@ -217,7 +222,9 @@ public class Dashboard extends JPanel {
 		Add_Cryptor_JDialog Edit_Cryptor_Dialog = new Add_Cryptor_JDialog(tmp_Crypto);
 		
 		tmp_Crypto = Edit_Cryptor_Dialog.self_Crypto;
-		
+		if(tmp_Crypto == null) {
+			return;
+		}
 		
 		this.myburp.Site_List.get(this.now_Domain).edit_Request_Cryptor(Reqeust_index,tmp_Crypto);
 		

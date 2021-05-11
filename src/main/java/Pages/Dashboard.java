@@ -63,7 +63,11 @@ public class Dashboard extends JPanel {
 		JButton Site_Remove_Btn = new JButton("Remove");
 		Site_Remove_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Site_List_Remove();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Site_List_Remove();
+					}
+				});
 			}
 		});
 		Site_Remove_Btn.setBounds(297, 103, 113, 27);
@@ -72,7 +76,11 @@ public class Dashboard extends JPanel {
 		JButton Site_Clear_Btn = new JButton("Clear");
 		Site_Clear_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Site_List_Clear();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Site_List_Clear();
+					}
+				});
 			}
 		});
 		Site_Clear_Btn.setBounds(299, 158, 113, 27);
@@ -84,9 +92,13 @@ public class Dashboard extends JPanel {
 		HR_Site_List.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		HR_Site_List.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				if(!e.getValueIsAdjusting()) {
-					Site_List_Changed();
-				}
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if(!e.getValueIsAdjusting()) {
+							Site_List_Changed();
+						}
+					}
+				});
 			}
 		});
 		HR_Site_List.setModel(HR_Site_List_DFM);
@@ -129,7 +141,11 @@ public class Dashboard extends JPanel {
 		JButton Reqeust_Cryptor_Remove_Btn = new JButton("Remove");
 		Reqeust_Cryptor_Remove_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Request_Cryptor_Remove();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Request_Cryptor_Remove();
+					}
+				});
 			}
 		});
 		Reqeust_Cryptor_Remove_Btn.setBounds(59, 264, 113, 27);
@@ -141,7 +157,11 @@ public class Dashboard extends JPanel {
 		});
 		Request_Cryptor_Add_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Request_Crytor_Add();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Request_Crytor_Add();
+					}
+				});
 			}
 		});
 		
@@ -152,12 +172,20 @@ public class Dashboard extends JPanel {
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
 		Site_Add_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Site_List_Add();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Site_List_Add();
+					}
+				});
 			}
 		});
 		BurpStatus_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ChangeBurpStatus(((JToggleButton) e.getSource()).isSelected());
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						ChangeBurpStatus(((JToggleButton) e.getSource()).isSelected());
+					}
+				});
 			}
 		});
 		this.setVisible(true);
@@ -189,16 +217,17 @@ public class Dashboard extends JPanel {
 		int index = this.HR_Site_List.getSelectedIndex();
 		if(index != -1) {
 			String domain = this.HR_Site_List_DFM.getElementAt(index).toString();
-			this.myburp.Site_Remove(domain);
-			this.HR_Site_List_DFM.remove(index);
-			if(index == 0) {
-				if(this.HR_Site_List_DFM.getSize() != 0) {
-					this.HR_Site_List.setSelectedIndex(index);
-				}else {
-					this.now_Domain = "";
+			if(this.myburp.Site_Remove(domain)) {
+				this.HR_Site_List_DFM.remove(index);
+				if(index == 0) {
+					if(this.HR_Site_List_DFM.getSize() != 0) {
+						this.HR_Site_List.setSelectedIndex(index);
+					}else {
+						this.now_Domain = "";
+					}
+				}else if(this.HR_Site_List_DFM.getSize() == index) {
+					this.HR_Site_List.setSelectedIndex(index -1);
 				}
-			}else if(this.HR_Site_List_DFM.getSize() == index) {
-				this.HR_Site_List.setSelectedIndex(index -1);
 			}
 		}
 	}
@@ -224,15 +253,15 @@ public class Dashboard extends JPanel {
 		if(Add_Cryptor_Dialog.self_Crypto == null) {
 				return;
 		}
-		
 		// 临时赋值
 		tmp_Crypto = Add_Cryptor_Dialog.self_Crypto;
 		
 		int Reqeust_index = this.Request_Cryptor_List.getSelectedIndex();
+		
 		this.myburp.Site_List.get(this.now_Domain).add_Request_Cryptor(Reqeust_index,tmp_Crypto);
 		if(this.Request_Cryptor_List_DFM.getSize() == Reqeust_index +1) {
 			this.Request_Cryptor_List_DFM.addElement(tmp_Crypto.self_Type);
-			this.Request_Cryptor_List.setSelectedIndex(Reqeust_index + 1);
+			this.Request_Cryptor_List.setSelectedIndex(Reqeust_index+1);
 		}else {
 			this.Request_Cryptor_List_DFM.add(Reqeust_index+1, tmp_Crypto.self_Type);
 			this.Request_Cryptor_List.setSelectedIndex(Reqeust_index + 1);	
@@ -258,7 +287,7 @@ public class Dashboard extends JPanel {
 	}
 	public void Request_Cryptor_Remove() {
 		int Request_index = this.Request_Cryptor_List.getSelectedIndex();
-		if(Request_index != -1) {
+		if(Request_index != -1 && this.myburp.Site_List.get(this.now_Domain).remove_Request_Cryptor(Request_index)) {
 			this.Request_Cryptor_List_DFM.remove(Request_index);
 			// 如果不是最后一个 Cryptor，选中 下一个Cryptor
 			if(Request_index == this.Request_Cryptor_List_DFM.getSize()) {

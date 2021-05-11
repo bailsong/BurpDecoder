@@ -11,19 +11,29 @@ public class Site {
 		this.Domain = para_Domain;
 	}
 	public boolean add_Request_Cryptor(int index,Crypto para_Cryptor){
-		if(index == -1) {
+		// 在尾部追加新增条目
+		if(this.Request_Cryptor_Name_Stack.size() == index + 1) {
 			this.Request_Cryptor_Stack.add(para_Cryptor);
 			this.Request_Cryptor_Name_Stack.add(para_Cryptor.self_Type);	
 		}else {
+			// 在点击选择的条目后方插入新增条目
 			this.Request_Cryptor_Stack.add(index,para_Cryptor);
 			this.Request_Cryptor_Name_Stack.add(index,para_Cryptor.self_Type);
 		}
-		
 		return true;
 	}
 	public boolean edit_Request_Cryptor(int index,Crypto para_Cryptor) {
-		this.Request_Cryptor_Stack.set(index, para_Cryptor);
-		this.Request_Cryptor_Name_Stack.set(index, para_Cryptor.self_Type);
+		this.Request_Cryptor_Stack.set(index+1, para_Cryptor);
+		this.Request_Cryptor_Name_Stack.set(index+1, para_Cryptor.self_Type);
 		return true;
+	}
+	public boolean remove_Request_Cryptor(int index) {
+		try {
+			this.Request_Cryptor_Name_Stack.remove(index);
+			this.Request_Cryptor_Stack.remove(index);
+			return true;
+		}catch(Exception e) {
+			return false;
+		}
 	}
 }

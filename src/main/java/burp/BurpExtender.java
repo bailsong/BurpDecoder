@@ -28,6 +28,10 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 		this.BurpStatus = false;
 		
 		this.stdout.println("Hello");
+		this.stdout.println("==========================================");
+		this.stdout.println("Coded by bailsong");
+		this.stdout.println("此插件仅用作学习交流，任何组织或个人不得用于违法行为，否则由使用者自行承担法律后果");
+		this.stdout.println("==========================================");
 		this.dashboard = new Dashboard(this);
 		callbacks.addSuiteTab(this);
 		callbacks.customizeUiComponent(this.dashboard);
@@ -45,12 +49,14 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 			if(messageIsRequest) {
 				String request_String = new String(messageInfo.getMessageInfo().getRequest());
 				String body_String = get_Request_Body_String(request_String);
+				this.stdout.println("=============================================");
 				this.stdout.println("Proxy Got Request: "+body_String);
 				for(Crypto tmp_Cryptor: this.Site_List.get(domain).Request_Cryptor_Stack) {
 					this.stdout.println("=== Dealed with "+tmp_Cryptor.self_Type);
 					this.stdout.println("=== Data Format: " + tmp_Cryptor.Data_Format);
 					this.stdout.println("=== Data position: "+tmp_Cryptor.Data_Position);
 					this.stdout.println("=== Cryptor EncodedString: ");
+					this.stdout.println("++++++++++++++++++++++++++++++++++++++++++++++");
 					//this.stdout.println(tmp_Cryptor.get_Data_Posi_String(body_String));
 					body_String = tmp_Cryptor.decode(body_String);
 				}
@@ -74,12 +80,14 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 					Vector<Crypto> tmp_reverse_Request_Cryptor_Stack = this.Site_List.get(domain).Request_Cryptor_Stack;
 					Collections.reverse(tmp_reverse_Request_Cryptor_Stack);	
 
+					this.stdout.println("=============================================");
 					this.stdout.println("HTTP Got Request: "+body_String);
 					for(Crypto tmp_Cryptor: tmp_reverse_Request_Cryptor_Stack){
 						this.stdout.println("=== Dealed with "+tmp_Cryptor.self_Type);
 						this.stdout.println("=== Data Format: " + tmp_Cryptor.Data_Format);
 						this.stdout.println("=== Data position: "+tmp_Cryptor.Data_Position);
 						this.stdout.println("=== Cryptor EncodedString: ");
+						this.stdout.println("++++++++++++++++++++++++++++++++++++++++++++++");
 						body_String  = tmp_Cryptor.encode(body_String);
 					}
 					Collections.reverse(tmp_reverse_Request_Cryptor_Stack);
@@ -116,10 +124,10 @@ public class BurpExtender implements IBurpExtender,IProxyListener,IHttpListener,
 	}
 	public boolean Site_Remove(String para_domain) {
 		if(this.Site_List.containsKey(para_domain)) {
-			return false;
-		}else {
 			this.Site_List.remove(para_domain);
 			return true;
+		}else {
+			return false;
 		}
 	}
 	public boolean Site_Clear() {

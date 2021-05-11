@@ -2,10 +2,7 @@ package Pages;
 import java.awt.BorderLayout;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
 import javax.swing.border.LineBorder;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -23,6 +20,7 @@ public class Add_Cryptor_JDialog extends JDialog {
 	public String[] Data_Format_List = new String[] {"RAW","JSON"};
 	public JComboBox Cryptor_List_Box;
 	public JComboBox DataFormat_Select_CBX;
+	public boolean isEdit = false;
 	/**
 	 * Launch the application.
 	 */
@@ -31,9 +29,11 @@ public class Add_Cryptor_JDialog extends JDialog {
 	 * Create the frame.
 	 */
 	public Add_Cryptor_JDialog() {
+		this.isEdit = false;
+		this.self_Crypto = null;
 		this.setModal(true);
 		this.setTitle("Add Cryptor");
-		setMinimumSize(new Dimension(800, 800));
+		setMinimumSize(new Dimension(800, 600));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 
@@ -48,9 +48,11 @@ public class Add_Cryptor_JDialog extends JDialog {
 		this.setVisible(true);
 	}
 	public Add_Cryptor_JDialog(Crypto para_Crypto) {
+		this.isEdit = true;
+		this.self_Crypto = null;
 		this.setModal(true);
 		this.setTitle("Add Cryptor");
-		setMinimumSize(new Dimension(800, 800));
+		setMinimumSize(new Dimension(800, 600));
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 
@@ -86,7 +88,6 @@ public class Add_Cryptor_JDialog extends JDialog {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
-		
 		
 	
 		
@@ -204,10 +205,13 @@ public class Add_Cryptor_JDialog extends JDialog {
 		//设置监听事件门
 		Cryptor_List_Box.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED ) {
-					Change_Cryptor_Panel(Cryptor_List_Box.getSelectedItem().toString());
-					
-				}
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						if(e.getStateChange() == ItemEvent.SELECTED ) {
+							Change_Cryptor_Panel(Cryptor_List_Box.getSelectedItem().toString(),isEdit);
+						}	
+					}
+				});
 			}
 		});
 		
@@ -231,20 +235,30 @@ public class Add_Cryptor_JDialog extends JDialog {
 		footer_Panel.add(Cancel_Btn);
 		Comfirm_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Submit_Cryptor();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Submit_Cryptor();
+					}
+				});
 			}
 		});
 		Cancel_Btn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Close_Frame();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Close_Frame();
+					}
+				});
 			}
 		});
 	}
 	
-	public void Change_Cryptor_Panel(String para_Cryptor) {
+	public void Change_Cryptor_Panel(String para_Cryptor,boolean para_isEidt) {
 		switch(para_Cryptor) {
 		case "Cryptor_URL":
-			this.self_Crypto = new Crypto_URL();
+			if(isEdit == false)
+				this.self_Crypto = new Crypto_URL();
+			this.isEdit = false;
 			this.Middle_Panel.removeAll();
 			this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
 			this.Middle_Panel.setVisible(true);
@@ -253,7 +267,9 @@ public class Add_Cryptor_JDialog extends JDialog {
 			this.setVisible(true);
 			break;
 		case "Cryptor_AES":
-			this.self_Crypto = new Crypto_AES();
+			if(isEdit == false)
+				this.self_Crypto = new Crypto_AES();
+			this.isEdit = false;
 			this.Middle_Panel.removeAll();
 			this.Middle_Panel.add(this.self_Crypto.self_Panel,BorderLayout.CENTER);
 			this.Middle_Panel.setVisible(true);
@@ -262,7 +278,9 @@ public class Add_Cryptor_JDialog extends JDialog {
 			this.setVisible(true);
 			break;
 		case "Cryptor_HEX":
-			this.self_Crypto = new Crypto_HEX();
+			if(isEdit == false)
+				this.self_Crypto = new Crypto_HEX();
+			this.isEdit = false;
 			this.Middle_Panel.removeAll();
 			this.Middle_Panel.add(this.self_Crypto.self_Panel);
 			this.Middle_Panel.setVisible(true);

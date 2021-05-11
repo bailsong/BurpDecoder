@@ -72,9 +72,9 @@ public class Crypto_AES extends Crypto{
 			
 			byte[] encryped = cipher.doFinal(dataBytes);
 			if(this.coding.equals("HEX")) {
-				return Common.Common.parseByte2HexStr(encryped);
+				return set_Data_Posi_String(para_Body_String,Common.Common.parseByte2HexStr(encryped));
 			}else {
-				return Base64.getEncoder().encodeToString(encryped);
+				return set_Data_Posi_String(para_Body_String,Base64.getEncoder().encodeToString(encryped));
 			}
 		}catch(Exception e) {
 			return para_Body_String;
